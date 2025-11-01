@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Task module.
+Cache task module.
 """
 
 from .cache_manager import (
@@ -10,6 +10,9 @@ from .cache_manager import (
 )
 from .webp_single import generate_single_webp, save_frame_as_webp
 from .webp_animation import generate_webp_animation, collect_animation_frames
+from .video_preview_generator import (
+    VideoPreviewGenerator, KeyFrameSelector, VideoSegment, generate_video_preview
+)
 
 __all__ = [
     'FaceAnalyzerCacheManager',
@@ -19,4 +22,8 @@ __all__ = [
     'save_frame_as_webp',
     'generate_webp_animation',
     'collect_animation_frames',
+    'VideoPreviewGenerator',
+    'KeyFrameSelector',
+    'VideoSegment',
+    'generate_video_preview'
 ]
