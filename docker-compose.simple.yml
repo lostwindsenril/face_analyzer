@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # Main application service
+  face-analyzer:
+    build:
+      context: ..
+      dockerfile: face_analyzer/Dockerfile
+    image: face-analyzer:latest
+    container_name: face-analyzer-app
+    restart: unless-stopped
+    
+    # GPU support configuration
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    
+    # Port mapping
+    ports:
+      - "5000:5000"
+    
+    # Environment variables
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video
+      - CUDA_VISIBLE_DEVICES=all
+      - PYTHONPATH=/app
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+      - LOG_LEVEL=INFO
+      - MAX_CONCURRENT_REQUESTS=5
+      - ENABLE_GPU=true
+      - ENABLE_REDIS=false
+    
+    # Volume mounts
+    volumes:
+      # Persist model files
+      - ./models:/app/models
+      # Log directory
+      - ./logs:/app/logs
+      # Temp directory
+      - ./temp:/app/temp
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    
+    # Resource limits
+    mem_limit: 8g
+    mem_reservation: 4g
+    cpus: '4.0'
+    
+    # Security configuration
+    security_opt:
+      - no-new-privileges:true
+
+# If external access is needed, uncomment the network configuration below
+# networks:
+#   default:
+#     driver: bridge
